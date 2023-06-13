@@ -12,12 +12,24 @@ final taskProvider = Provider<TaskModel>((ref) {
 
 final taskListProvider = StateNotifierProvider<TaskList, TodoTaskList>((ref) {
   return TaskList(TodoTaskList(data: [
-    TaskModel(id: _uuidV4.v4(), description: "Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обр о точно чтобы показать как обро точно чтобы показать как обр"),
+    TaskModel(
+        id: _uuidV4.v4(),
+        description:
+            "Купить что-то, где-то, зачем-то, но зачем не очень понятно, но точно чтобы показать как обр о точно чтобы показать как обро точно чтобы показать как обр"),
     TaskModel(id: _uuidV4.v4(), description: "Купить что-то"),
     TaskModel(id: _uuidV4.v4(), description: "Купить что-то"),
-    TaskModel(id: _uuidV4.v4(), description: "Купить что-то", priority: TaskPriority.high),
-    TaskModel(id: _uuidV4.v4(), description: "Купить что-то", priority: TaskPriority.high),
-    TaskModel(id: _uuidV4.v4(), description: "Купить что-то", priority: TaskPriority.low),
+    TaskModel(
+        id: _uuidV4.v4(),
+        description: "Купить что-то",
+        priority: TaskPriority.high),
+    TaskModel(
+        id: _uuidV4.v4(),
+        description: "Купить что-то",
+        priority: TaskPriority.high),
+    TaskModel(
+        id: _uuidV4.v4(),
+        description: "Купить что-то",
+        priority: TaskPriority.low),
     TaskModel(id: _uuidV4.v4(), description: "Купить что-то"),
     TaskModel(id: _uuidV4.v4(), description: "Купить что-то"),
     TaskModel(id: _uuidV4.v4(), description: "Купить что-то"),
@@ -30,7 +42,8 @@ final taskListProvider = StateNotifierProvider<TaskList, TodoTaskList>((ref) {
 class TaskList extends StateNotifier<TodoTaskList> {
   TaskList(TodoTaskList initialList) : super(initialList);
 
-  void add(String description, {TaskPriority priority = TaskPriority.normal, DateTime? deadline}) {
+  void add(String description,
+      {TaskPriority priority = TaskPriority.normal, DateTime? deadline}) {
     state = TodoTaskList(data: [
       ...state.data,
       TaskModel(
@@ -38,6 +51,13 @@ class TaskList extends StateNotifier<TodoTaskList> {
           description: description,
           priority: priority,
           deadline: deadline)
+    ]);
+  }
+
+  void change(String id, TaskModel newModel) {
+    state = TodoTaskList(data: [
+      for (final todo in state.data)
+        if (todo.id == id) newModel else todo
     ]);
   }
 

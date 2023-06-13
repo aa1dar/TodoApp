@@ -1,24 +1,49 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_app/models/task_model.dart';
+import 'package:todo_app/models/task_priority.dart';
+import 'package:todo_app/providers/task_list_provider.dart';
+import 'package:todo_app/utils/extensions/extensions.dart';
 import 'package:todo_app/utils/style/app_themes.dart';
 
-class TaskCreationPage extends StatefulWidget {
+class TaskCreationPage extends ConsumerStatefulWidget {
   const TaskCreationPage({super.key});
 
   @override
-  State<TaskCreationPage> createState() => _TaskCreationPageState();
+  ConsumerState<TaskCreationPage> createState() => _TaskCreationPageState();
 }
 
-class _TaskCreationPageState extends State<TaskCreationPage> {
+class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
   late TextEditingController _textEditingController;
-  final List<String> list = <String>['One', 'Two', 'Three'];
-  String? dropdownValue;
-  bool switcher = false;
+  final List<TaskPriority> _list = TaskPriority.values.toList();
+  late final String? _editingTaskId;
+
+  TaskPriority? _dropdownValue = TaskPriority.normal;
+  DateTime? _selectedDate;
+  bool _switcher = false;
+
   @override
   void initState() {
     _textEditingController = TextEditingController();
-    dropdownValue = list.first;
+    _loadData();
     super.initState();
+  }
+
+  bool get isEditing => _editingTaskId != null;
+
+  void _loadData() {
+    final task = ref.read(taskProvider);
+    if (task.id.isEmpty) {
+      _editingTaskId = null;
+      return;
+    }
+
+    _editingTaskId = task.id;
+    _textEditingController.text = task.description;
+    _selectedDate = task.deadline;
+    _dropdownValue = task.priority;
+    _switcher = task.deadline != null;
   }
 
   @override
@@ -48,10 +73,10 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               child: TextButton(
-                onPressed: () {},
-                child: Text('СОХРАНИТЬ'),
+                onPressed: onSave,
                 style: TextButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 4.0)),
+                    padding: const EdgeInsets.symmetric(vertical: 4.0)),
+                child: const Text('СОХРАНИТЬ'),
               ))
         ],
       ),
@@ -82,7 +107,7 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
                     maxLines: null,
                     autofocus: false,
                     scrollPadding: EdgeInsets.zero,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Что надо сделать...',
                     ),
                     controller: _textEditingController,
@@ -91,47 +116,53 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
             const SizedBox(height: 28.0),
             Flexible(
               child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Важность', style: textStyle.bodyMedium),
                         DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                          value: dropdownValue,
-                          iconStyleData: const IconStyleData(
-                              icon: const SizedBox.shrink()),
+                            child: DropdownButton2<TaskPriority>(
+                          value: _dropdownValue,
+                          iconStyleData:
+                              const IconStyleData(icon: SizedBox.shrink()),
                           buttonStyleData:
-                              ButtonStyleData(width: 164, height: 35),
+                              const ButtonStyleData(width: 164, height: 35),
                           isExpanded: false,
-                          // style: textStyle.titleSmall,
                           selectedItemBuilder: (context) {
-                            return list
-                                .map<DropdownMenuItem<String>>((String value) {
-                              TextStyle? style = textStyle.titleSmall;
+                            return _list.map<DropdownMenuItem<TaskPriority>>(
+                                (TaskPriority value) {
+                              Color? textColor = value == TaskPriority.normal
+                                  ? colorScheme.tertiary
+                                  : null;
 
-                              return DropdownMenuItem<String>(
+                              return DropdownMenuItem<TaskPriority>(
                                 value: value,
                                 enabled: true,
                                 child: Text(
-                                  value,
-                                  style: style,
+                                  value.toReadableString(),
+                                  style: textStyle.titleSmall!
+                                      .copyWith(color: textColor),
                                 ),
                               );
                             }).toList();
                           },
-                          onChanged: (String? value) {
+                          onChanged: (TaskPriority? value) {
                             setState(() {
-                              dropdownValue = value!;
+                              _dropdownValue = value!;
                             });
                           },
-                          items: list
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
+                          items: _list.map<DropdownMenuItem<TaskPriority>>(
+                              (TaskPriority value) {
+                            Color? textColor = value == TaskPriority.high
+                                ? colorScheme.error
+                                : null;
+                            return DropdownMenuItem<TaskPriority>(
                               value: value,
                               child: Text(
-                                value,
-                                style: textStyle.bodyMedium,
+                                value.toReadableString(),
+                                style: textStyle.bodyMedium!
+                                    .copyWith(color: textColor),
                               ),
                             );
                           }).toList(),
@@ -149,21 +180,27 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
                                     'Сделать до',
                                     style: textStyle.bodyMedium,
                                   ),
-                                  InkWell(
-                                      onTap: () {
-                                        _showDatePicker();
-                                      },
-                                      child: Text('2 июня 2021',
-                                          style: textStyle.labelLarge!.copyWith(
-                                              color: colorScheme.primary)))
+                                  if (_selectedDate != null)
+                                    InkWell(
+                                        onTap: () => _showDatePicker(),
+                                        child: Text(_selectedDate!.toRuLocale(),
+                                            style: textStyle.labelLarge!
+                                                .copyWith(
+                                                    color:
+                                                        colorScheme.primary)))
                                 ],
                               ),
                             ),
                             Switch(
-                                value: switcher,
+                                value: _switcher,
                                 onChanged: (change) {
                                   setState(() {
-                                    switcher = change;
+                                    _switcher = change;
+                                    if (change) {
+                                      _selectedDate = DateTime.now();
+                                    } else {
+                                      _selectedDate = null;
+                                    }
                                   });
                                 })
                           ],
@@ -172,12 +209,11 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
             ),
             const Divider(),
             Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextButton.icon(
-                    onPressed: () {},
+                    onPressed: isEditing ? onDelete : null,
                     style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        // iconColor: colorScheme.error,
                         foregroundColor: colorScheme.error,
                         textStyle: textStyle.bodyMedium,
                         disabledForegroundColor: colorScheme.surface),
@@ -187,21 +223,76 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
     );
   }
 
-  void _showDatePicker({DateTime? selectedDay}) {
-    showDatePicker(
+  void onDelete() {
+    ref.read(taskListProvider.notifier).delete(_editingTaskId!);
+    Navigator.pop(context);
+  }
+
+  void onSave() {
+    if (!validateText(_textEditingController.text)) {
+      return;
+    }
+    if (isEditing) {
+      final newTask = TaskModel(
+          id: _editingTaskId!,
+          description: _textEditingController.text,
+          deadline: _selectedDate,
+          priority: _dropdownValue ?? TaskPriority.normal);
+      ref.read(taskListProvider.notifier).change(_editingTaskId!, newTask);
+    } else {
+      ref.read(taskListProvider.notifier).add(_textEditingController.text,
+          priority: _dropdownValue ?? TaskPriority.normal,
+          deadline: _selectedDate);
+    }
+
+    Navigator.pop(context);
+  }
+
+  void _showDatePicker() async {
+    final newDate = await showDatePicker(
       helpText: '',
       initialDatePickerMode: DatePickerMode.day,
       confirmText: 'ГОТОВО',
       cancelText: 'ОТМЕНА',
       context: context,
-      initialDate: selectedDay ?? DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2023),
       builder: (context, child) => Container(
         child: child,
       ),
       lastDate: DateTime(2024),
     );
+
+    if (newDate != null) {
+      setState(() {
+        _selectedDate = newDate;
+      });
+    }
   }
 
-  // TextStyle getByPriority
+  bool validateText(String text) {
+    if (text.isNotEmpty) {
+      return true;
+    }
+
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Описание пустое',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              content: Text(
+                'Введите описание задачи',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('ОК'))
+              ],
+            ));
+
+    return false;
+  }
 }
