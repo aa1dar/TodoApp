@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/style/app_colors.dart';
-
 class CustomHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double expandedHeight;
   final double statusBarHeight;
@@ -9,13 +7,15 @@ class CustomHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget collapsedSubTitle;
   final Widget collapsedTitle;
   final Widget action;
+  final Color backgroundColor;
   const CustomHeaderDelegate(
       {required this.action,
       required this.collapsedSubTitle,
       required this.expandedTitle,
       required this.collapsedTitle,
       required this.expandedHeight,
-      required this.statusBarHeight});
+      required this.statusBarHeight,
+      required this.backgroundColor});
 
   @override
   Widget build(
@@ -29,7 +29,7 @@ class CustomHeaderDelegate extends SliverPersistentHeaderDelegate {
             bottom: 0,
             right: 0,
             left: 0,
-            child: _buildExpandedAppBar(shrinkOffset))
+            child: _buildExpandedAppBar(shrinkOffset)),
       ],
     );
   }
@@ -37,8 +37,6 @@ class CustomHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget _buildCollapsedAppBar(double offset) => Opacity(
       opacity: calculateCollapsedOpacity(offset),
       child: AppBar(
-          backgroundColor: AppColor.backLightPrimary,
-          surfaceTintColor: AppColor.backLightPrimary,
           centerTitle: false,
           actions: [
             Padding(
@@ -47,30 +45,42 @@ class CustomHeaderDelegate extends SliverPersistentHeaderDelegate {
           ],
           title: collapsedTitle));
 
-  Widget _buildExpandedAppBar(double offset) => Opacity(
-      opacity: calculateExpandedOpacity(offset),
-      child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding:
-                const EdgeInsets.only(left: 60.0, right: 25.0, bottom: 18.0),
-            child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: FittedBox(child: expandedTitle),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [collapsedSubTitle, action],
-                  )
-                ]),
-          )));
+  Widget _buildExpandedAppBar(double offset) {
+    final opacity = calculateExpandedOpacity(offset);
+
+    // The Positioned overlaps the collapsed appbar and
+    // taps/pressing to IconButton are not handled.
+    // To fix that need to remove the expandable appbar from Stack
+    if (opacity == 0.0) {
+      return const SizedBox.shrink();
+    }
+
+    return Opacity(
+        opacity: opacity,
+        child: Container(
+            color: backgroundColor,
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(left: 60.0, right: 25.0, bottom: 18.0),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      child: FittedBox(child: expandedTitle),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [collapsedSubTitle, action],
+                    )
+                  ]),
+            )));
+  }
 
   double calculateCollapsedOpacity(double offset) {
     // NOTE: Adding the collapse speed of the appbar
-    final opacity = 3 * (offset / expandedHeight);
+    final opacity = 10 * (offset / expandedHeight);
     if (opacity > 1.0) {
       return 1.0;
     }

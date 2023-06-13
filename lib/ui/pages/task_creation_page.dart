@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/utils/style/app_themes.dart';
 
 class TaskCreationPage extends StatefulWidget {
   const TaskCreationPage({super.key});
@@ -32,11 +33,26 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.close,),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).primaryIconTheme.color,
+          ),
+          splashRadius: AppTheme.appBarIconSplashRadius,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              child: TextButton(onPressed: () {}, child: Text('СОХРАНИТЬ')))
+              child: TextButton(
+                onPressed: () {},
+                child: Text('СОХРАНИТЬ'),
+                style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 4.0)),
+              ))
         ],
       ),
       body: SingleChildScrollView(
@@ -133,9 +149,6 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
                                     'Сделать до',
                                     style: textStyle.bodyMedium,
                                   ),
-                                  const SizedBox(
-                                    height: 4.0,
-                                  ),
                                   InkWell(
                                       onTap: () {
                                         _showDatePicker();
@@ -161,13 +174,14 @@ class _TaskCreationPageState extends State<TaskCreationPage> {
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextButton.icon(
-                    onPressed: null,
+                    onPressed: () {},
                     style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
                         // iconColor: colorScheme.error,
                         foregroundColor: colorScheme.error,
                         textStyle: textStyle.bodyMedium,
                         disabledForegroundColor: colorScheme.surface),
-                    icon: Icon(Icons.delete_forever),
+                    icon: const Icon(Icons.delete),
                     label: const Text('Удалить'))),
           ])),
     );

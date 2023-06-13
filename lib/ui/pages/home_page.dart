@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:todo_app/providers/count_of_task_provider.dart';
+import 'package:todo_app/providers/filtered_task_list_provider.dart';
+import 'package:todo_app/providers/task_filter_provider.dart';
 import 'package:todo_app/providers/task_list_provider.dart';
 import 'package:todo_app/ui/pages/task_creation_page.dart';
 import 'package:todo_app/ui/widgets/task_item.dart';
+import 'package:todo_app/utils/style/app_themes.dart';
 
 import '../widgets/custom_header_delegate.dart';
 
@@ -12,15 +16,20 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tasks = ref.watch(taskListProvider);
     final textStyle = Theme.of(context).textTheme;
+    final countOfTask = ref.watch(countOfTaskProvider);
+
+    final filter = ref.watch(filterStateProvider);
+
+    IconData? getIcon() {
+      return filter == FilterType.none
+          ? Icons.visibility_off
+          : Icons.visibility;
+    }
 
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const TaskCreationPage()));
-          },
+          onPressed: () => _navigateToTaskCreationPage(context),
           child: const Icon(
             Icons.add,
           ),
@@ -28,20 +37,32 @@ class HomePage extends ConsumerWidget {
         body: CustomScrollView(slivers: [
           SliverPersistentHeader(
             delegate: CustomHeaderDelegate(
-                action: Icon(Icons.visibility,
-                    color: Theme.of(context).colorScheme.primary),
+                action: IconButton(
+                  splashRadius: AppTheme.appBarIconSplashRadius,
+                  icon: Icon(getIcon(),
+                      color: Theme.of(context).colorScheme.primary),
+                  onPressed: () {
+                    final currentState = ref.read(filterStateProvider);
+                    FilterType newState = currentState == FilterType.none
+                        ? FilterType.uncompleted
+                        : FilterType.none;
+                    ref.read(filterStateProvider.notifier).state = newState;
+                  },
+                ),
                 expandedTitle: Text(
                   'Мои дела',
                   style: textStyle.titleLarge,
                 ),
-                collapsedSubTitle:
-                    Text('Выполнено — 5', style: textStyle.bodyMedium),
+                collapsedSubTitle: Text('Выполнено — $countOfTask',
+                    style: Theme.of(context).inputDecorationTheme.hintStyle),
                 collapsedTitle: Text(
                   'Мои дела',
                   style: textStyle.titleMedium,
                 ),
                 expandedHeight: 160.0,
-                statusBarHeight: MediaQuery.of(context).padding.top),
+                statusBarHeight: MediaQuery.of(context).padding.top,
+                backgroundColor:
+                    Theme.of(context).appBarTheme.surfaceTintColor!),
             pinned: true,
           ),
           SliverStack(
@@ -64,22 +85,45 @@ class HomePage extends ConsumerWidget {
                             const BorderRadius.all(Radius.circular(8.0)))),
               ),
               SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: horizontalPadding, vertical: 4.0),
+                  padding: const EdgeInsets.only(
+                      right: horizontalPadding,
+                      left: horizontalPadding,
+                      top: 4.0,
+                      bottom: 52.0),
                   sliver: SliverList.builder(
-                      itemCount: tasks.data.length,
+                      itemCount: ref.watch(filteredTaskListProvider
+                          .select((taskList) => taskList.data.length)),
                       itemBuilder: (context, index) {
                         return ProviderScope(
                           overrides: [
-                            taskProvider.overrideWithValue(tasks.data[index])
+                            taskProvider.overrideWithValue(
+                                ref.watch(filteredTaskListProvider).data[index])
                           ],
                           child: const TaskItem(),
                         );
-                      }))
+                      })),
+              SliverPositioned(
+                  bottom: 0,
+                  left: horizontalPadding,
+                  right: horizontalPadding,
+                  child: InkWell(
+                      onTap: () => _navigateToTaskCreationPage(context),
+                      child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 18.0, horizontal: 8.0 + 40),
+                          child: Text(
+                            'Новое',
+                            style: Theme.of(context)
+                                .inputDecorationTheme
+                                .hintStyle,
+                          ))))
             ],
           ),
         ]));
   }
+
+  void _navigateToTaskCreationPage(BuildContext context) => Navigator.push(
+      context, MaterialPageRoute(builder: (_) => const TaskCreationPage()));
 
   static const horizontalPadding = 8.0;
 }

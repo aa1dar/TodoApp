@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_app/ui/pages/home_page.dart';
 
 class CustomDismissible extends StatefulWidget {
   final Widget child;
@@ -27,6 +28,8 @@ class CustomDismissible extends StatefulWidget {
 }
 
 class _CustomDismissibleState extends State<CustomDismissible> {
+  static const _homePageSumOfPadding = 2 * HomePage.horizontalPadding;
+
   double progress = 0;
   double length = 0;
 
@@ -42,7 +45,7 @@ class _CustomDismissibleState extends State<CustomDismissible> {
   @override
   void didChangeDependencies() {
     setState(() {
-      length = MediaQuery.of(context).size.width - 16.0;
+      length = MediaQuery.of(context).size.width - _homePageSumOfPadding;
     });
 
     super.didChangeDependencies();

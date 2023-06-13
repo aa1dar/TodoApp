@@ -4,7 +4,7 @@ class AppColor {
   // Light theme
   static const supportLightSeparator = Color(0x33000000);
   static const supprotLightOverlay = Color(0x0F000000);
-  static const labelLightPrimary = Color(0x00000000);
+  static const labelLightPrimary = Color(0xFF000000);
   static const labelLightSecondary = Color(0x99000000);
   static const labelLightTertiary = Color(0x4D000000);
   static const labelLightDisable = Color(0x26000000);

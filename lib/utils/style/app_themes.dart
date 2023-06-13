@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/utils/style/app_colors.dart';
 
 class AppTheme {
+  static const appBarIconSplashRadius = Material.defaultSplashRadius * 0.5;
   static const textTheme = TextTheme(
       titleLarge: TextStyle(
           fontSize: 32.0, height: 1.1875, fontWeight: FontWeight.w500),
@@ -24,9 +25,13 @@ class AppTheme {
           secondary: AppColor.colorLightBlue,
           brightness: Brightness.light,
           tertiary: AppColor.labelLightTertiary,
+          tertiaryContainer:  AppColor.colorLightGray,
           error: AppColor.colorLightRed,
+          secondaryContainer: AppColor.colorLightGreen,
           surface: AppColor.labelLightDisable),
+      primaryIconTheme: const IconThemeData(color: AppColor.labelLightPrimary),
       iconTheme: const IconThemeData(color: AppColor.colorLightWhite),
+      // iconButtonTheme: IconButtonThemeData(style: IconButton.styleFrom(visualDensity: VisualDensity.compact)),
       switchTheme: SwitchThemeData(trackColor:
           MaterialStateProperty.resolveWith((Set<MaterialState> states) {
         if (states.contains(MaterialState.selected)) {
@@ -40,7 +45,11 @@ class AppTheme {
         }
         return AppColor.backLightElevated;
       })),
+      checkboxTheme: const CheckboxThemeData(
+          fillColor: MaterialStatePropertyAll(AppColor.supportLightSeparator),
+          checkColor: MaterialStatePropertyAll(AppColor.backLightSecondary)),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: AppColor.colorLightBlue,
           foregroundColor: AppColor.colorLightWhite),
       dividerColor: AppColor.supportLightSeparator,
       textTheme: textTheme,
@@ -57,7 +66,6 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         color: AppColor.backLightPrimary,
         surfaceTintColor: AppColor.backLightPrimary,
-        elevation: 0,
         centerTitle: true,
       ),
       inputDecorationTheme: InputDecorationTheme(

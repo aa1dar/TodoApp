@@ -4,7 +4,7 @@ class TaskModel {
   final String id;
   final String description;
   final bool isCompleted;
-  final TaskPriority? priority;
+  final TaskPriority priority;
   final DateTime? deadline;
 
   TaskModel({
