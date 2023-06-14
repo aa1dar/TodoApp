@@ -1,4 +1,3 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_app/models/task_model.dart';
@@ -30,7 +29,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
     super.initState();
   }
 
-  bool get isEditing => _editingTaskId != null;
+  bool get _isEditing => _editingTaskId != null;
 
   void _loadData() {
     final task = ref.read(taskProvider);
@@ -121,75 +120,71 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Важность', style: textStyle.bodyMedium),
-                        DropdownButtonHideUnderline(
-                            child: DropdownButton2<TaskPriority>(
-                          value: _dropdownValue,
-                          iconStyleData:
-                              const IconStyleData(icon: SizedBox.shrink()),
-                          buttonStyleData:
-                              const ButtonStyleData(width: 164, height: 35),
-                          isExpanded: false,
-                          selectedItemBuilder: (context) {
-                            return _list.map<DropdownMenuItem<TaskPriority>>(
-                                (TaskPriority value) {
-                              Color? textColor = value == TaskPriority.normal
-                                  ? colorScheme.tertiary
-                                  : null;
+                        const SizedBox(height: 4.0),
+                        Theme(
+                          data: Theme.of(context)
+                              .copyWith(highlightColor: Colors.transparent),
+                          child: PopupMenuButton(
+                            surfaceTintColor: Colors.transparent,
+                            position: PopupMenuPosition.over,
+                            tooltip: 'Select the priority',
+                            initialValue: _dropdownValue,
+                            itemBuilder: (context) {
+                              return _list.map<PopupMenuItem<TaskPriority>>(
+                                  (TaskPriority value) {
+                                Color? textColor = value == TaskPriority.high
+                                    ? colorScheme.error
+                                    : null;
+                                return PopupMenuItem<TaskPriority>(
+                                    value: value,
+                                    child: Text(
+                                      value.toReadableString(),
+                                      style: textStyle.bodyMedium!
+                                          .copyWith(color: textColor),
+                                    ));
+                              }).toList();
+                            },
+                            onSelected: (TaskPriority value) {
+                              setState(() {
+                                _dropdownValue = value;
+                              });
+                            },
+                            child: Builder(
+                              builder: (context) {
+                                Color? textColor =
+                                    _dropdownValue == TaskPriority.normal
+                                        ? colorScheme.tertiary
+                                        : null;
 
-                              return DropdownMenuItem<TaskPriority>(
-                                value: value,
-                                enabled: true,
-                                child: Text(
-                                  value.toReadableString(),
+                                return Text(
+                                  _dropdownValue!.toReadableString(),
                                   style: textStyle.titleSmall!
                                       .copyWith(color: textColor),
-                                ),
-                              );
-                            }).toList();
-                          },
-                          onChanged: (TaskPriority? value) {
-                            setState(() {
-                              _dropdownValue = value!;
-                            });
-                          },
-                          items: _list.map<DropdownMenuItem<TaskPriority>>(
-                              (TaskPriority value) {
-                            Color? textColor = value == TaskPriority.high
-                                ? colorScheme.error
-                                : null;
-                            return DropdownMenuItem<TaskPriority>(
-                              value: value,
-                              child: Text(
-                                value.toReadableString(),
-                                style: textStyle.bodyMedium!
-                                    .copyWith(color: textColor),
-                              ),
-                            );
-                          }).toList(),
-                        )),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16.0),
                         const Divider(),
                         const SizedBox(height: 16.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Flexible(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Сделать до',
-                                    style: textStyle.bodyMedium,
-                                  ),
-                                  if (_selectedDate != null)
-                                    InkWell(
-                                        onTap: () => _showDatePicker(),
-                                        child: Text(_selectedDate!.toRuLocale(),
-                                            style: textStyle.labelLarge!
-                                                .copyWith(
-                                                    color:
-                                                        colorScheme.primary)))
-                                ],
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Сделать до',
+                                  style: textStyle.bodyMedium,
+                                ),
+                                if (_selectedDate != null)
+                                  InkWell(
+                                      onTap: () => _showDatePicker(),
+                                      child: Text(_selectedDate!.toRuLocale(),
+                                          style: textStyle.labelLarge!.copyWith(
+                                              color: colorScheme.primary)))
+                              ],
                             ),
                             Switch(
                                 value: _switcher,
@@ -211,7 +206,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
             Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextButton.icon(
-                    onPressed: isEditing ? onDelete : null,
+                    onPressed: _isEditing ? onDelete : null,
                     style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         foregroundColor: colorScheme.error,
@@ -232,7 +227,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
     if (!validateText(_textEditingController.text)) {
       return;
     }
-    if (isEditing) {
+    if (_isEditing) {
       final newTask = TaskModel(
           id: _editingTaskId!,
           description: _textEditingController.text,
