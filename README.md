@@ -22,5 +22,5 @@
 * Prioritize tasks
 * Set a deadline for the task
 
-## Donwload
+## Download
 <a href="https://github.com/aa1dar/TodoApp/releases">Tap me )<a>
