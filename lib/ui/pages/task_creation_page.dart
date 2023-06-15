@@ -248,6 +248,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
     final newDate = await showDatePicker(
       helpText: '',
       initialDatePickerMode: DatePickerMode.day,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
       confirmText: 'ГОТОВО',
       cancelText: 'ОТМЕНА',
       context: context,
@@ -256,7 +257,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
       builder: (context, child) => Container(
         child: child,
       ),
-      lastDate: DateTime(2024),
+      lastDate: DateTime(2100),
     );
 
     if (newDate != null) {

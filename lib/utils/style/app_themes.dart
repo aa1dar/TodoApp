@@ -59,6 +59,20 @@ class AppTheme {
 
   static ThemeData lightTheme() => ThemeData(
       useMaterial3: false,
+      datePickerTheme: const DatePickerThemeData(
+        rangeSelectionOverlayColor: MaterialStatePropertyAll(Colors.red),
+        weekdayStyle: TextStyle(
+            color: AppColor.labelLightTertiary, fontSize: 12, height: 1.67),
+        yearForegroundColor:
+            MaterialStatePropertyAll(AppColor.labelLightPrimary),
+        dayForegroundColor:
+            MaterialStatePropertyAll(AppColor.labelLightPrimary),
+        surfaceTintColor: Colors.white,
+        headerForegroundColor: AppColor.colorLightWhite,
+        backgroundColor: AppColor.backLightSecondary,
+        todayBorder: BorderSide(color: AppColor.colorLightBlue),
+        headerBackgroundColor: AppColor.colorLightBlue,
+      ),
       cardColor: AppColor.backLightSecondary,
       scaffoldBackgroundColor: AppColor.backLightPrimary,
       fontFamily: 'Roboto',
@@ -66,6 +80,7 @@ class AppTheme {
       colorScheme: const ColorScheme.light().copyWith(
           primary: AppColor.colorLightBlue,
           secondary: AppColor.colorLightBlue,
+          onSurface: AppColor.labelLightPrimary,
           brightness: Brightness.light,
           tertiary: AppColor.labelLightTertiary,
           tertiaryContainer: AppColor.colorLightGray,
@@ -116,6 +131,18 @@ class AppTheme {
 
   static ThemeData darkTheme() => ThemeData(
       useMaterial3: false,
+      datePickerTheme: const DatePickerThemeData(
+        rangeSelectionOverlayColor: MaterialStatePropertyAll(Colors.red),
+        weekdayStyle: TextStyle(
+            color: AppColor.labelDarkTertiary, fontSize: 12, height: 1.67),
+        yearForegroundColor: MaterialStatePropertyAll(AppColor.colorDarkWhite),
+        dayForegroundColor: MaterialStatePropertyAll(AppColor.colorDarkWhite),
+        surfaceTintColor: Colors.white,
+        headerForegroundColor: AppColor.colorDarkWhite,
+        backgroundColor: AppColor.backDarkSecondary,
+        todayBorder: BorderSide(color: AppColor.colorDarkBlue),
+        headerBackgroundColor: AppColor.colorDarkBlue,
+      ),
       cardColor: AppColor.backDarkSecondary,
       scaffoldBackgroundColor: AppColor.backDarkPrimary,
       fontFamily: 'Roboto',
@@ -123,6 +150,7 @@ class AppTheme {
       colorScheme: const ColorScheme.light().copyWith(
           primary: AppColor.colorDarkBlue,
           secondary: AppColor.colorDarkBlue,
+          onSurface: AppColor.labelDarkPrimary,
           brightness: Brightness.light,
           tertiary: AppColor.labelDarkTertiary,
           tertiaryContainer: AppColor.colorDarkGray,
