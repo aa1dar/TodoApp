@@ -15,6 +15,7 @@ class TaskCreationPage extends ConsumerStatefulWidget {
 
 class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
   late TextEditingController _textEditingController;
+  late FocusNode _focusNode;
   final List<TaskPriority> _list = TaskPriority.values.toList();
   late final String? _editingTaskId;
 
@@ -25,6 +26,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
   @override
   void initState() {
     _textEditingController = TextEditingController();
+    _focusNode = FocusNode();
     _loadData();
     super.initState();
   }
@@ -48,6 +50,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
   @override
   void dispose() {
     _textEditingController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -103,9 +106,11 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
                           const BorderRadius.all(Radius.circular(8.0))),
                   child: TextField(
                     style: textStyle.bodyMedium,
+                    onTapOutside: (event) => _focusNode.unfocus(),
                     minLines: 3,
                     maxLines: null,
                     autofocus: false,
+                    focusNode: _focusNode,
                     scrollPadding: EdgeInsets.zero,
                     decoration: const InputDecoration(
                       hintText: 'Что надо сделать...',
