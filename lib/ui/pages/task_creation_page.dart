@@ -102,6 +102,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
                       borderRadius:
                           const BorderRadius.all(Radius.circular(8.0))),
                   child: TextField(
+                    style: textStyle.bodyMedium,
                     minLines: 3,
                     maxLines: null,
                     autofocus: false,
@@ -273,6 +274,7 @@ class _TaskCreationPageState extends ConsumerState<TaskCreationPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
+              backgroundColor: Theme.of(context).cardColor,
               title: Text(
                 'Описание пустое',
                 style: Theme.of(context).textTheme.titleMedium,
