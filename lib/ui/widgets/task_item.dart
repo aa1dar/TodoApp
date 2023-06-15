@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_app/models/task_priority.dart';
+import 'package:todo_app/navigation/navigation_routes.dart';
 import 'package:todo_app/providers/task_list_provider.dart';
 import 'package:todo_app/ui/pages/task_creation_page.dart';
 import 'package:todo_app/ui/widgets/task_suffix_title_widget.dart';
@@ -74,11 +75,14 @@ class TaskItem extends ConsumerWidget {
                   child: InkWell(
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => ProviderScope(overrides: [
-                                      taskProvider.overrideWithValue(task)
-                                    ], child: const TaskCreationPage())));
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => ProviderScope(overrides: [
+                                    taskProvider.overrideWithValue(task)
+                                  ], child: const TaskCreationPage()),
+                              settings: const RouteSettings(
+                                  name: NavigationRouteName.taskCreationPage)),
+                        );
                       },
                       child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -125,6 +129,4 @@ class TaskItem extends ConsumerWidget {
               ]),
             )));
   }
-
-  // TextStyle _getTextStyleByParams(BuildContext context, )
 }

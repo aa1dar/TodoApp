@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:todo_app/navigation/navigation_routes.dart';
 import 'package:todo_app/providers/count_of_task_provider.dart';
 import 'package:todo_app/providers/filtered_task_list_provider.dart';
 import 'package:todo_app/providers/task_filter_provider.dart';
 import 'package:todo_app/providers/task_list_provider.dart';
-import 'package:todo_app/ui/pages/task_creation_page.dart';
 import 'package:todo_app/ui/widgets/task_item.dart';
 import 'package:todo_app/utils/style/app_themes.dart';
 
@@ -122,8 +122,9 @@ class HomePage extends ConsumerWidget {
         ]));
   }
 
-  void _navigateToTaskCreationPage(BuildContext context) => Navigator.push(
-      context, MaterialPageRoute(builder: (_) => const TaskCreationPage()));
+  void _navigateToTaskCreationPage(BuildContext context) {
+    Navigator.pushNamed(context, NavigationRouteName.taskCreationPage);
+  }
 
   static const horizontalPadding = 8.0;
 }
